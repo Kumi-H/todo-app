@@ -1,0 +1,14 @@
+version: "3"
+services:
+  next:
+    build:
+      context: ./todo_frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    volumes:
+      - ./todo_frontend:/usr/src/app
+      - /app/node_modules
+    command: npm run dev
