@@ -1,71 +1,57 @@
 /**
  * タスク詳細コンポーネント
  */
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { XIcon } from "@heroicons/react/outline";
 import Link from 'next/link'
 import { GetTask } from '../lib/getter';
 import { putTask } from '../lib/actions';
-
-type ItemType = {
-  id: number;
-  title: string;
-  detail: string;
-  date: string;
-  completed: boolean
-};
+import ApiLoading from '@/app/loading';
+import PageError from '@/app/error';
+import type { ItemType } from '@/lib/ItemType';
 
 const Task = (taskId: { id: number }) => {
   const [item, setItem] = useState<ItemType>({
     id: 0,
     title: "",
     detail: "",
-    date: "",
+    date: "9999-12-31T00:00:00.000Z",
     completed: false
   });
 
-  const { data, isError, isLoading } = GetTask(taskId.id);
-  useEffect(() => {
-    if (data) {
-      setItem(data);
-    }
-  }, [data]);
-
-  if (isError) return <div>failed to load</div>;
-  if (isLoading) return <div>Loading...</div>;
   console.log(taskId);
-  console.log(data);
-  console.log(item);
+  const { data, isError, isLoading } = GetTask(taskId.id);
+
+  if (isError) return <PageError />;
+  if (isLoading) return <ApiLoading />;
+  if (item.id === 0 && data) {
+    setItem(data);
+    console.log(data);
+    console.log(item);
+  }
 
   // 更新管理
   const handleChangeItem = (
-    e: React.ChangeEvent<HTMLInputElement>, name: string
+    e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>, 
+    name: string
   ) => {
+    if (name === "completed") {
+      setItem({ ...item, completed: !item.completed });
+      return;
+    } 
     let eventValue = e.target.value;
-    if (name === "date" && eventValue !== "") {
+    if (name === "date"){
+      eventValue === ""? 
+      eventValue = "9999-12-31T00:00:00.000Z" :
       eventValue += "T00:00:00.000Z";
-    } else if (name === "date" && eventValue === "") {
-      eventValue = "9999-12-31T00:00:00.000Z";
     }
     setItem({ ...item, [name]: eventValue });
   }
 
-  // ステータス管理
-  const handleChangeStatus = (
-    e: React.ChangeEvent<HTMLSelectElement>, name: string
-  ) => {
-    console.log(e.target.value);
-    let eventValue = false
-    e.target.value === "first" ? eventValue : eventValue = true
-    setItem({ ...item, [name]: eventValue });
-    console.log(eventValue);
-  }
-
-  // タスク更新
+  // closeボタンをトリガーにタスク更新をリクエストする
   const handleClick = async () => {
     try {
       await putTask(item);
-      console.log(putTask(item));
     } catch (error) {
       console.error('Failed to update task:', error);
     }
@@ -101,10 +87,7 @@ const Task = (taskId: { id: number }) => {
         <input
           type="text"
           className="w-5/6 rounded-r-xl pl-3.5 border-white
-                      focus:border-white
-                      focus:ring-2 
-                      focus:ring-[#d9afd9b3] 
-                      focus:ring-opacity-95"
+                      focus:border-white focus:ring-0"
           value={item.title}
           onChange={e => handleChangeItem(e, "title")}
         />
@@ -119,10 +102,7 @@ const Task = (taskId: { id: number }) => {
         <input
           type="text"
           className="w-5/6 rounded-r-xl pl-3.5 border-white
-                      focus:border-white
-                      focus:ring-2 
-                      focus:ring-[#d9afd9b3] 
-                      focus:ring-opacity-95"
+                      focus:border-white focus:ring-0"
           value={item.detail}
           onChange={e => handleChangeItem(e, "detail")}
         />
@@ -137,10 +117,7 @@ const Task = (taskId: { id: number }) => {
         <input
           type="date"
           className="w-5/6 rounded-r-xl pl-3.5 pr-7 border-white
-                      focus:border-white
-                      focus:ring-2 
-                      focus:ring-[#d9afd9b3] 
-                      focus:ring-opacity-95"
+                      focus:border-white focus:ring-0"
           value={(
             item.date === "9999-12-31T00:00:00.000Z" ?
               "" : item.date.replace("T00:00:00.000Z", "")
@@ -157,18 +134,11 @@ const Task = (taskId: { id: number }) => {
         </div>
         <select
           className="w-5/6 rounded-r-xl p-3.5 border-white
-                      focus:border-white
-                      focus:ring-2 
-                      focus:ring-[#d9afd9b3] 
-                      focus:ring-opacity-95"
+                      focus:border-white focus:ring-0"
           name="status"
-          onChange={e => handleChangeStatus(e, "completed")}>
-          <option value="first">
-            {item.completed ? "完了" : "進行中"}
-          </option>
-          <option value="second">
-            {item.completed ? "進行中" : "完了"}
-          </option>
+          onChange={e => handleChangeItem(e, "completed")}>
+          <option >{item.completed ? "完了" : "進行中"}</option>
+          <option >{item.completed ? "進行中" : "完了"}</option> 
         </select>
       </div>
     </div>

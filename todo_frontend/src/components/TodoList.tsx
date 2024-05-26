@@ -1,41 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PencilAltIcon, TrashIcon, PlusIcon } from "@heroicons/react/outline";
 import Link from 'next/link'
 import { GetTodos } from '../lib/getter';
 import { postTodos, deleteTask, putTask } from '../lib/actions';
-// import ApiLoading from '@/app/loading';
-
-type itemType = {
-  id: number;
-  title: string;
-  detail: string;
-  date: string;
-  completed: boolean
-};
+import ApiLoading from '@/app/loading';
+import PageError from '@/app/error';
+import type { ItemType } from '@/lib/ItemType';
 
 const TodoList = () => {
-  const [todoList, setTodoList] = useState<itemType[]>([]);
+  const [todoList, setTodoList] = useState<ItemType[]>([]);
+  console.log(todoList);
   const { data, isError, isLoading } = GetTodos();
 
-  // 
-  useEffect(() => {
-    if (data) {
-      setTodoList(data);
-    }
-  }, [data]);
-  // 
-
-  if (isError) return <div>failed to load</div>;
-  if (isLoading) return <div>Loading...</div>;
-  // if (isLoading) return <ApiLoading />;
-
-  // 現在の最大idを取得
-  let maxId: number = Math.max(...todoList.map(item => item.id));
-  console.log(maxId);
+  if (isError) return <PageError />;
+  if (isLoading) return <ApiLoading />;
+  if (todoList.length === 0 && data) {
+    setTodoList(data);
+    console.log(data);
+    console.log(todoList);
+  }
 
   // 新規タスク追加
   const handleClick = async () => {
     try {
+      // 現在の最大idを取得
+      let maxId: number = Math.max(...todoList.map(item => item.id));
       const newTodo = {
         id: ++maxId,
         title: "入力してください",
@@ -48,7 +37,6 @@ const TodoList = () => {
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error('Failed to add new todo:', error)
-        // エラーページへ遷移する
       };
 
     }
@@ -69,7 +57,7 @@ const TodoList = () => {
     }))
   }
 
-  // タイトルの更新管理
+  // タイトルの更新をDBへ登録
   const handleBlurTitle = async (id: number) => {
     try {
       const updatedTodo = todoList.find(todo => todo.id === id);
@@ -86,27 +74,24 @@ const TodoList = () => {
     };
   }
 
-  //　チェックボックスの状態管理
-  // true,falseのロジックを修正する
-  const handleCompleted = async (id: number) => {
-    try {
-      setTodoList(todoList.map(todo => {
-        if (todo.id === id) {
-          return {
-            ...todo,
-            completed: !todo.completed
-          };
-        } else {
-          return todo;
-        }
-      }))
-      const updatedTodo = todoList.find(todo => todo.id === id);
-      if (updatedTodo === undefined) {
-        console.error('item does not exist')
-        return;
+  // チェックボックスの状態管理
+  const handleCompleted = async (id: number, completed: boolean) => {
+    const updatedTodoList = todoList.map((todo) => {
+      if (todo.id === id) {
+        return {...todo, completed: completed};
       }
+      return todo;
+    })
+    setTodoList(updatedTodoList);
+
+    const updatedTodo = updatedTodoList.find(todo => todo.id === id);
+    console.log(updatedTodo);
+    if (updatedTodo === undefined) {
+      console.error('item does not exist')
+      return;
+    }
+    try {
       await putTask(updatedTodo);
-      // console.log(putTask(updatedTodo));
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error('Failed to update task:', error)
@@ -146,7 +131,7 @@ const TodoList = () => {
               className="h-6 w-6 rounded-full mx-5 text-[#97d9e1b3] 
                           focus:outline-none focus:ring-0"
               checked={todo.completed}
-              onChange={() => handleCompleted(todo.id)}
+              onChange={() => handleCompleted(todo.id, !todo.completed)}
             />
             <input
               type="text"
@@ -177,7 +162,8 @@ const TodoList = () => {
       ))}
       <button
         onClick={handleClick}
-        className="group h-12 ml-7 pl-1.5 flex items-center justify-center rounded-xl">
+        className="group h-12 ml-7 pl-1.5 
+                  flex items-center justify-center rounded-xl">
         <PlusIcon className="h-6 w-6 text-[#7a8ca3]" />
         <div className="opacity-0 invisible ml-2 group-hover:visible opacity-100">
           Add new task

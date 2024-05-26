@@ -1,15 +1,8 @@
+import type { ItemType } from "./ItemType";
 const apiUrl = process.env.NEXT_PUBLIC_EXPRESS_API_URL;
 
-type itemType = {
-  id: number;
-  title: string;
-  detail: string;
-  date: string;
-  completed: boolean
-};
-
 // Todoリストに新規タスク追加
-export const postTodos = async (props: itemType) => {
+export const postTodos = async (props: ItemType) => {
   console.log(props);
   try {
     const response = await fetch(`${apiUrl}/todo/lists`, {
@@ -30,7 +23,7 @@ export const postTodos = async (props: itemType) => {
 };
 
 // タスク更新
-export const putTask = async (props: itemType) => {
+export const putTask = async (props: ItemType) => {
   try {
     const response = await fetch(`${apiUrl}/todo/tasks/${props.id}`, {
       method: 'PUT',
