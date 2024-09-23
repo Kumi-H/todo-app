@@ -1,7 +1,13 @@
-## Section5 Todoアプリ開発
+## Todoアプリ
 
-### 仕様技術一覧
+### 機能
+- Todo一覧取得
+- タスク追加
+- タスク更新
+- タスク削除
+- タスク詳細表示
 
+### 使用技術
 #### フロントエンドフレームワーク
 * Next.js (App router)
 * TailwindCSS
@@ -21,14 +27,6 @@
 * PostgreSQL
 
 #### その他
-* Docker（フロントエンド, DB ※Expressはローカルで実行）
-
-### ポート
-フロントエンド: http://localhost:3000
-
-バックエンド: http://localhost:8000
-
-DB: http://localhost5432:
-
+* Docker
 
 
