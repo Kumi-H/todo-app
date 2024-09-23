@@ -1,7 +1,7 @@
 "use client"
 
-import TopHeader from "../components/TopHeader";
-import TodoList from "../components/TodoList";
+import TopHeader from "./components/TopHeader";
+import TodoList from "./components/TodoList";
 
 function App() {
   return (

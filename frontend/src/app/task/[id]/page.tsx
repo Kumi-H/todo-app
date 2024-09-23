@@ -1,7 +1,7 @@
 "use client"
 
-import TopHeader from "../../../components/TopHeader";
-import Task from "../../../components/Task";
+import TopHeader from "../../components/TopHeader";
+import Task from "../../components/Task";
 
 const TaskPage = ({ params }: { params: { id: number } }) => {
   return (

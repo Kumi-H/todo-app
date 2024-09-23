@@ -5,7 +5,7 @@ import { GetTodos } from "../lib/getter";
 import { postTodos, deleteTask, putTask } from "../lib/actions";
 import ApiLoading from "@/app/loading";
 import PageError from "@/app/error";
-import type { ItemType } from "@/lib/ItemType";
+import type { ItemType } from "../types/types";
 
 const TodoList = () => {
   const [todoList, setTodoList] = useState<ItemType[]>([]);

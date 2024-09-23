@@ -5,7 +5,7 @@ import { GetTask } from "../lib/getter";
 import { putTask } from "../lib/actions";
 import ApiLoading from "@/app/loading";
 import PageError from "@/app/error";
-import type { ItemType } from "@/lib/ItemType";
+import type { ItemType } from "../types/types";
 
 const Task = (taskId: { id: number }) => {
   const [item, setItem] = useState<ItemType>({

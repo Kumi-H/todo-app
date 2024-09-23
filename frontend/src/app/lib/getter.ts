@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import type { ItemType } from "../app/types/types";
+import type { ItemType } from "../types/types";
 const apiUrl = process.env.NEXT_PUBLIC_EXPRESS_API_URL;
 
 const fetcher = (url: string) => fetch(url)
