@@ -2,13 +2,27 @@ version: "3"
 services:
   next:
     build:
-      context: ./todo_frontend
+      context: ./frontend
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
       - PORT=3000
     volumes:
-      - ./todo_frontend:/usr/src/app
+      - ./frontend:/usr/src/app
       - /app/node_modules
     command: npm run dev
+
+  postgres:
+    image: postgres:10.3
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=upass
+      - POSTGRES_DB=todo_db
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+      
+volumes:
+  postgres:
